@@ -19,7 +19,7 @@ end
 class A2
     def initialize(arr)
         arr.each do |name|
-            A2.define_method "hoge_#{name}" do |arg|
+            define_singleton_method "hoge_#{name}" do |arg|
                 if arg.nil?
                     dev_team
                 else
