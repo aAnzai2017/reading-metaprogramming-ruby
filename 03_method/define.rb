@@ -50,7 +50,7 @@ module OriginalAccessor
                 instance_variable_set("@#{name}", arg)
                 if arg.instance_of?(TrueClass) || arg.instance_of?(FalseClass)
                     define_singleton_method "#{name}?" do
-                        !!instance_variable_get("@#{name}")
+                        instance_variable_get("@#{name}")
                     end
                 end
             end
