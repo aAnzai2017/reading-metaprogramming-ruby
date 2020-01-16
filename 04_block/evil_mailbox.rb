@@ -32,7 +32,6 @@ EvilMailbox = Class.new do
   end
 
   def receive_mail
-    mail = @obj.receive_mail
-    mail
+    @obj.receive_mail
   end
 end
