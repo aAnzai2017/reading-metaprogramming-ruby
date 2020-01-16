@@ -113,7 +113,6 @@ module TryOver3::TaskHelper
 
       new_klass_name = name.to_s.split("_").map{ |w| w[0] = w[0].upcase; w }.join
       
-      
       @klasses ||= {}
       @klasses[new_klass_name] = task_block
     end
