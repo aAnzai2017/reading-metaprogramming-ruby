@@ -24,9 +24,6 @@
 #     2. e.g. クラスメソッドで `setting :name, 'bot'` と実行した場合は、インスタンス内で `settings.name` の戻り値は `bot` の文字列になります
 
 class SimpleBot
-    @responds = {}
-    @settings = {}
-
     def self.respond key, &block
         @responds ||= {}
         @responds[key] = block
@@ -42,6 +39,7 @@ class SimpleBot
         self.class.class_eval do
             @responds ||= {}
             @settings ||= {}
+
             obj.instance_variable_set(:@responds, @responds)
             @settings.each do |key, value|
                 obj.define_singleton_method key do
@@ -53,7 +51,7 @@ class SimpleBot
 
     def ask word
         if @responds.key? word
-            instance_eval &@responds[word]
+            self.instance_eval &@responds[word]
         else
             nil
         end
