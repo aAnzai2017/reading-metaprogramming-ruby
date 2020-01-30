@@ -23,8 +23,6 @@
 #     1. settingメソッドに渡された値は、インスタンスメソッド `settings` から返されるオブジェクトに、メソッド名としてアクセスすることで取り出すことができます
 #     2. e.g. クラスメソッドで `setting :name, 'bot'` と実行した場合は、インスタンス内で `settings.name` の戻り値は `bot` の文字列になります
 
-require 'byebug'
-
 class SimpleBot
     @responds = {}
     @settings = {}
@@ -65,20 +63,3 @@ class SimpleBot
         self
     end
 end
-
-
-# class Bot < SimpleBot
-#   setting :name, 'bot'
-#   respond 'keyword' do
-#     "response #{settings.name}"
-#   end
-# end
-
-# class Bot2 < SimpleBot
-#   setting :name, 'bot'
-#   respond 'keyword2' do
-#     "response #{settings.name}"
-#   end
-# end
-
-# puts Bot2.new.ask('keyword2')
