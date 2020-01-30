@@ -26,50 +26,59 @@
 require 'byebug'
 
 class SimpleBot
+    @responds = {}
+    @settings = {}
+
     def self.respond key, &block
-        @@responds ||= {}
-        @@responds[key] = block
+        @responds ||= {}
+        @responds[key] = block
     end
 
     def self.setting key, value
-        @@settings ||= {}
-        @@settings[key] = value
+        @settings ||= {}
+        @settings[key] = value
     end
 
     def initialize
-        @obj = Object.new
-        s = @@settings
-        @obj.instance_eval do
-            define_singleton_method :method_missing do |key|
-                if s.include? key
-                    s[key]
-                else
-                    nil
+        obj = self
+        self.class.class_eval do
+            @responds ||= {}
+            @settings ||= {}
+            obj.instance_variable_set(:@responds, @responds)
+            @settings.each do |key, value|
+                obj.define_singleton_method key do
+                    value
                 end
             end
         end
     end
 
     def ask word
-        if @@responds.include? word
-            instance_eval &@@responds[word]
+        if @responds.key? word
+            instance_eval &@responds[word]
         else
             nil
         end
     end
 
     def settings
-        @obj
+        self
     end
 end
 
 
-class Bot < SimpleBot
-  setting :name, 'bot'
-  respond 'keyword' do
-    "response #{settings.name}"
-    # 'hello'
-  end
-end
+# class Bot < SimpleBot
+#   setting :name, 'bot'
+#   respond 'keyword' do
+#     "response #{settings.name}"
+#   end
+# end
 
-puts Bot.new.ask('keyword')
+# class Bot2 < SimpleBot
+#   setting :name, 'bot'
+#   respond 'keyword2' do
+#     "response #{settings.name}"
+#   end
+# end
+
+# puts Bot2.new.ask('keyword2')
