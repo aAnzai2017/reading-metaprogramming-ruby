@@ -25,13 +25,19 @@ module SimpleModel
                     define_method "#{name.to_s}=" do |val|
                         instance_variable_set("@#{name.to_s}", val)
                         
-                        changed_arr = instance_variable_get("@changed_arr") || []
+                        changed_arr = if instance_variable_defined?('@changed_arr') 
+                            instance_variable_get("@changed_arr")
+                        else
+                            []
+                        end
+                        
                         changed_arr << name unless changed_arr.include? name
                         instance_variable_set("@changed_arr", changed_arr)
                     end
 
                     define_method "#{name.to_s}_changed?" do
-                        changed_arr = instance_variable_get("@changed_arr") || []
+                        return false unless instance_variable_defined?('@changed_arr')
+                        changed_arr = instance_variable_get("@changed_arr")
                         changed_arr.include? name
                     end
 
@@ -57,11 +63,3 @@ module SimpleModel
         end
     end
 end
-
-# class Product
-#     include SimpleModel
-    
-#     attr_accessor :name, :description
-# end
-
-# puts Product.new(name: 1).name
