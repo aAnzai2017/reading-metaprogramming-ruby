@@ -106,38 +106,31 @@ end
 # TryOver3::TaskHelper という include すると task というクラスマクロが与えらる以下のようなモジュールがあります。
 module TryOver3::TaskHelper
   def self.included(klass)
-    klass.define_singleton_method :task do |name, &task_block|
-      klass.define_singleton_method name do
-        task_block.call
-      end
-
-      new_klass_name = name.to_s.split("_").map{ |w| w[0] = w[0].upcase; w }.join
+    klass.class_eval do
+      instance_variable_set(:@klasses, {})
       
-      @klasses ||= {}
-      @klasses[new_klass_name] = task_block
-    end
+      define_singleton_method :task do |name, &task_block|
+        define_singleton_method(name, &task_block)
 
-    klass.define_singleton_method :const_missing do |name|
-      arr = @klasses || []
-
-      unless arr.include?(name.to_s)
-        puts @klasses
-        return super(name)
+        new_klass_name = name.to_s.split("_").map{ |w| w[0] = w[0].upcase; w }.join
+        @klasses[new_klass_name] = task_block
       end
 
-      task_block = @klasses[name.to_s]
+      define_singleton_method :const_missing do |name|
+        return super(name) unless @klasses.include?(name.to_s)
 
-      new_klass = Class.new do
-        define_singleton_method :run do
-          warn "Warning: TryOver3::A5Task::Foo.run is duplicated"
-          puts "start #{Time.now}"
-          block_return = task_block.call
-          puts "finish #{Time.now}"
-          block_return
+        task_block = @klasses[name.to_s]
+
+        Class.new do
+          define_singleton_method :run do
+            warn "Warning: TryOver3::A5Task::Foo.run is duplicated"
+            puts "start #{Time.now}"
+            block_return = task_block.call
+            puts "finish #{Time.now}"
+            block_return
+          end
         end
       end
-
-      return new_klass
     end
   end
 end
