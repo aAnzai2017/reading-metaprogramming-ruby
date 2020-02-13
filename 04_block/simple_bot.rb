@@ -35,29 +35,29 @@ class SimpleBot
     end
 
     def initialize
-        obj = self
-        self.class.class_eval do
-            @responds ||= {}
-            @settings ||= {}
+        @responds = {}
 
-            obj.instance_variable_set(:@responds, @responds)
-            @settings.each do |key, value|
-                obj.define_singleton_method key do
-                    value
-                end
-            end
+        if self.class.instance_variable_defined?(:@responds)
+            @responds = self.class.instance_variable_get(:@responds)
         end
     end
 
     def ask word
         if @responds.key? word
-            self.instance_eval &@responds[word]
+            block = @responds[word]
+            self.class.class_eval(&block)
         else
             nil
         end
     end
 
-    def settings
-        self
+    def self.settings
+        Object.new.tap do |it|
+            @settings && @settings.each do |key, value|
+                it.define_singleton_method key do
+                    value
+                end
+            end
+        end
     end
 end
