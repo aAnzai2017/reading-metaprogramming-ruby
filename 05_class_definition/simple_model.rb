@@ -40,22 +40,23 @@ module SimpleModel
                         changed_arr = instance_variable_get("@changed_arr")
                         changed_arr.include? name
                     end
-
-                    def changed?
-                        !!@changed_arr && @changed_arr.size > 0
-                    end
-
-                    def restore!
-                        for k, v in @initial_state
-                            instance_variable_set("@#{k}", v)
-                        end
-                        @changed_arr = []
-                    end
                 end
+            end
+
+            def changed?
+                @changed_arr.size > 0
+            end
+
+            def restore!
+                for k, v in @initial_state
+                    instance_variable_set("@#{k}", v)
+                end
+                @changed_arr = []
             end
 
             def initialize(**hash)
                 @initial_state = hash
+                @changed_arr ||= []
                 for k, v in hash
                     instance_variable_set("@#{k}", v)
                 end
