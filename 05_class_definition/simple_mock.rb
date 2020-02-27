@@ -37,3 +37,38 @@
 # obj.imitated_method
 # obj.called_times(:imitated_method) #=> 2
 # ```
+
+module SimpleMock
+    def self.new
+        mock Object.new
+    end
+
+    def self.mock obj
+        obj.extend(SimpleMock)
+        obj.instance_variable_set(:@_times, {})
+        obj
+    end
+
+    def expects(name, expectation)
+        define_singleton_method(name) { |*args| expectation }
+        watch(name) if @_times.include? name
+    end
+    
+    def watch(name)
+        return if @_times.include? name
+
+        @_times[name] = 0
+        singleton_class.instance_eval do
+            alias_method "_#{name}_old", name
+
+            define_method(name) do |*args|
+                @_times[name] += 1
+                send("_#{name}_old", *args)
+            end
+        end
+    end
+    
+    def called_times(name)
+        @_times[name]
+    end
+end
